@@ -22,7 +22,7 @@ const iconColor = ref('color:#F8FAFB')
               <House />
             </el-icon><span>首页</span>
           </template>
-          <el-menu-item index="/index">首页</el-menu-item>
+          <el-menu-item index="/paper">首页</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="2">
           <template #title>
