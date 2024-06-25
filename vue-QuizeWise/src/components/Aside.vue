@@ -28,9 +28,9 @@ const iconColor = ref('color:#F8FAFB')
           <template #title>
             <el-icon>
               <Menu />
-            </el-icon><span>文章管理</span>
+            </el-icon><span>历史生成记录</span>
           </template>
-          <el-menu-item index="/admin/articles">文章管理列表</el-menu-item>
+          <el-menu-item index="/history">历史生成记录</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="3">
           <template #title>

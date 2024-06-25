@@ -19,12 +19,12 @@
         <!-- 自定义参数 -->
         <div class="defines">
           <div class="define">
-            <label for="page">页数:</label>
-            <input type="text" id="page" v-model="page">
+            <label for="pageNumber">页数:</label>
+            <input type="text" id="pageNumber" v-model="pageNumber">
           </div>
           <div class="define">
-            <label for="pro_num">题数:</label>
-            <input type="text" id="pro_num" v-model="pro_num">
+            <label for="problemNumber">题数:</label>
+            <input type="text" id="problemNumber" v-model="problemNumber">
           </div>
           </div>
           <div class="answer-attach">
@@ -71,8 +71,8 @@ export default {
         {name: '考试类型', opts:['中考','高考']}
       ],
       actives: [-1,-1,-1],
-      page: '',
-      pro_num: '',
+      pageNumber: '',
+      problemNumber: '',
       size: '',
       addtion: '',
       answer:false,
@@ -95,15 +95,15 @@ export default {
   computed:{
     entryPreview(){
       let subject=this.items[0].opts[this.actives[0]]
-      let year=this.items[1].opts[this.actives[1]]
+      let grade=this.items[1].opts[this.actives[1]]
       let exam=this.items[2].opts[this.actives[2]]
       let ret=''
       if(exam && subject){
         ret+='请你严格按照'+exam+'的格式，帮我生成一份'+subject+'试卷'
-        if(this.pro_num)
-          ret+='，题数为：'+this.pro_num
-        if(this.page)
-          ret+='，页数为：'+this.page
+        if(this.pageNumber)
+          ret+='，页数为：'+this.pageNumber
+        if(this.problemNumber)
+          ret+='，题数为：'+this.problemNumber
         if(this.answer)
           ret+='，生成一张试题卷后附带生成一张答案卷'
         else
