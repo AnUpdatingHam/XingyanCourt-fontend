@@ -26,14 +26,20 @@
             <label for="problemNumber">题数:</label>
             <input type="text" id="problemNumber" v-model="problemNumber">
           </div>
-          </div>
-          <div class="answer-attach">
-            <label for="answer">是否附带参考答案：</label>
-            <input type="checkbox" id="answer" v-model="answer">
-          </div>
-          <div class="addtion">
-            <label for="addtion">自定义补充词条:</label>
-            <input type="text" id="addtion" v-model="addtion">
+        </div>
+        <div class="answer-attach">
+          <label for="answer">是否附带参考答案：</label>
+          <input type="checkbox" id="answer" v-model="answer">
+        </div>
+        <div class="addtion">
+          <label for="addtion">自定义补充词条:</label>
+          <input type="text" id="addtion" v-model="addtion">
+        </div>
+
+        <!-- 命名 -->
+        <div class="name">
+          <label for="name">给试卷命名</label>
+          <input type="text" id="name" v-model="name">
         </div>
 
         <!-- 词条预览 -->
@@ -68,7 +74,7 @@ export default {
       items:[
         {name: '科目', opts:['语文','数学','英语']},
         {name: '年级', opts:['初一','初二','初三','高一','高二','高三']},
-        {name: '考试类型', opts:['中考','高考']}
+        {name: '考试类型', opts:['中考','高考','考研','CET4考试','CET6考试']}
       ],
       actives: [-1,-1,-1],
       pageNumber: '',
@@ -76,6 +82,7 @@ export default {
       size: '',
       addtion: '',
       answer:false,
+      name:'未命名',
       // 其他参数
     };
   },
@@ -161,7 +168,7 @@ form {
 
 .select-row{
   display: flex;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .select-opt{
@@ -187,7 +194,7 @@ form {
 }
 
 .submit {
-  margin-top: 40px;
+  margin-top: 20px;
   background-color: #409EFF;
   border:none;
   color:#fff;
@@ -203,7 +210,7 @@ form {
 
 .defines{
   display: flex;
-  margin-bottom:30px;
+  margin-bottom:20px;
 }
 
 .define{
@@ -220,11 +227,15 @@ form {
 .answer-attach{
   display: flex;
   gap:20px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .answer-attach input{
   width: 25px;
+}
+
+.addtion{
+  margin-bottom: 20px;
 }
 
 .addtion input{
@@ -234,8 +245,15 @@ form {
   width: 500px;
 }
 
+.name input{
+  margin-left:10px;
+  height: 30px;
+  font-size:18px;
+  width: 500px;
+}
+
 .entry-preview{
-  margin-top:40px;
+  margin-top:20px;
   display: flex;
   flex-direction: column;
 }
