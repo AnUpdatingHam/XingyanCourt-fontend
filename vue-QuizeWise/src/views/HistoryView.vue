@@ -56,6 +56,52 @@
 </template>
 
 <script>
+// 引入 Axios 库
+import axios from 'axios';
+
+// 定义一个异步函数来发送 GET 请求
+async function getUser() {
+  try {
+    // 使用 Axios 发送 GET 请求
+    //测试获取id为1的用户数据
+    const response = await axios.get('http://localhost:8080/user/user/1');
+    // 请求成功，'response' 包含了请求的结果
+    console.log(response.data); // 打印请求返回的数据
+  } catch (error) {
+    // 请求失败，捕获并处理错误
+    console.error('Error fetching data:', error);
+  }
+}
+//getUser();
+
+// 定义要发送的数据
+const userData = {
+  id: '1',
+  username: 'newUserName',
+  phone: '123456789',
+  email: 'newEmail'
+  // 其他用户属性...
+};
+
+// 定义一个异步函数来发送 PUT 请求，更改对应id的用户信息
+async function updateUser() {
+  try {
+    // 使用 Axios 发送 POST 请求，并包含 JSON 数据
+    const response = await axios.put('http://localhost:8080/user/user', userData, {
+      // 设置请求头，指明内容类型为 JSON
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    // 请求成功，打印响应数据
+    console.log(response.data);
+  } catch (error) {
+    // 请求失败，捕获并处理错误
+    console.error('Error update user:', error);
+  }
+}
+updateUser();
+
 export default{
   data(){
     return{

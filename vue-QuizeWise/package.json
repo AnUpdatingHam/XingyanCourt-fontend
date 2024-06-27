@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
+    "axios": "^1.7.2",
     "element-plus": "^2.3.14",
     "icons-vue": "^1.0.9",
     "pdfjs-dist": "^4.3.136",
