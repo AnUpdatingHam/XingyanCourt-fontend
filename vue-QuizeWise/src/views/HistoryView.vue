@@ -33,10 +33,10 @@
         <td>{{ item.subject }}</td>
         <td>{{ item.grade }}</td>
         <td>{{ item.type }}</td>
-        <td>{{ item.page_count }}</td>
-        <td>{{ item.question_count }}</td>
-        <td>{{ item.contain_answer }}</td>
-        <td>{{ item.create_time }}</td>
+        <td>{{ item.pageCount }}</td>
+        <td>{{ item.questionCount }}</td>
+        <td>{{ item.containAnswer }}</td>
+        <td>{{ item.createTime }}</td>
       </tr>
     </tbody>
   </table>
@@ -141,6 +141,29 @@ export default{
         console.error('Error fetching data:', error);
       }
     },
+
+    //获取历史记录
+    async getHistoryItems() {
+      try {
+        //get请求中特殊的query参数，拼接在路径里
+        const query_params = {
+          userId: 1,
+          keyword: '高一',
+          subject: '',
+          page: 1,
+          pageSize: 10,
+        };
+        const response = await axios.get('http://localhost:8080/user/testPaper/page', {params: query_params});
+        // 请求成功，'response' 包含了请求的结果
+        console.log(response.data); // 打印请求返回的数据
+        this.historyData=response.data.data.records
+        this.total=response.data.data.total
+
+      } catch (error) {
+        // 请求失败，捕获并处理错误
+        console.error('Error fetching data:', error);
+      }
+    },
   },
   computed:{
     displayData(){
@@ -181,7 +204,8 @@ export default{
     }
   },
   mounted(){
-    this.getUser()
+    //this.getUser()
+    this.getHistoryItems()
   }
 }
 </script>
