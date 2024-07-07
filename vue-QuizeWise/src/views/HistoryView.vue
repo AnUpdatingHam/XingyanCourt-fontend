@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class="search">
-      <input type="text" placeholder="搜索" v-model="search">
+      <input type="text" placeholder="搜索" v-model="state.searchValue">
       <img src="../assets/search.png">
     </div>
   </div>
@@ -35,8 +35,8 @@
         <td>{{ item.type }}</td>
         <td>{{ item.pageCount }}</td>
         <td>{{ item.questionCount }}</td>
-        <td>{{ item.containAnswer }}</td>
-        <td>{{ item.createTime }}</td>
+        <td>{{ item.containAnswer ? '有': '无' }}</td>
+        <td>{{ toTime(item.createTime) }}</td>
       </tr>
     </tbody>
   </table>
@@ -59,41 +59,12 @@
 // 引入 Axios 库
 import axios from 'axios';
 
-// // 定义要发送的数据
-// const userData = {
-//   id: '1',
-//   username: 'newUserName',
-//   phone: '123456789',
-//   email: 'newEmail'
-//   // 其他用户属性...
-// };
-
-// // 定义一个异步函数来发送 PUT 请求，更改对应id的用户信息
-// async function updateUser() {
-//   try {
-//     // 使用 Axios 发送 POST 请求，并包含 JSON 数据
-//     const response = await axios.put('http://localhost:8080/user/user', userData, {
-//       // 设置请求头，指明内容类型为 JSON
-//       headers: {
-//         'Content-Type': 'application/json'
-//       }
-//     });
-//     // 请求成功，打印响应数据
-//     console.log(response.data);
-//   } catch (error) {
-//     // 请求失败，捕获并处理错误
-//     console.error('Error update user:', error);
-//   }
-// }
-// updateUser();
-
 export default{
   data(){
     return{
-
+      userId: 1,
       options: ["语文","数学","英语"],
       active: -1,
-      search: '',
       state:{
         pageNum: 1,
         pageSize: 10,
@@ -102,11 +73,10 @@ export default{
         searchValue: "",
         total: 0,    //n
       },
-      historyData:[],
-        // { id: 1, user_id: "0", name: "未命名22", subject: '语文',  grade: '高三', type: '高考', page_count: 3, question_count: 34, contain_answer: '有', path: "rrr", create_time: "2024.5.6"},
-        // { id: 2, user_id: "0", name: "未命名21", subject: '英语',  grade: '初二', type: '中考', page_count: 5, question_count: 44, contain_answer: '无', path: "www", create_time: "2024.5.1"},
-        // { id: 3, user_id: "0", name: "未命名23", subject: '数学',  grade: '高一', type: '高考', page_count: 3, question_count: 10, contain_answer: '有', path: "uuu", create_time: "2024.4.28"},
-        
+      historyData:[
+        // { id: 1, user_id: 0, name: "未命名22", subject: '语文',  grade: '高三', type: '高考', pageCount: 3, questionCount: 34, containAnswer: true, path: "rrr", createTime: [2024,5,6,10,0]},
+        // { id: 2, user_id: 0, name: "未命名21", subject: '英语',  grade: '初二', type: '中考', pageCount: 5, questionCount: 44, containAnswer: false, path: "www", createTime: [2024,5,1,8,31]},
+      ],
     }
   },
   methods:{
@@ -146,14 +116,8 @@ export default{
     async getHistoryItems() {
       try {
         //get请求中特殊的query参数，拼接在路径里
-        const query_params = {
-          userId: 1,
-          keyword: '高一',
-          subject: '',
-          page: 1,
-          pageSize: 10,
-        };
-        const response = await axios.get('http://localhost:8080/user/testPaper/page', {params: query_params});
+        
+        const response = await axios.get('http://localhost:8080/user/user/page', {params: this.queryParams});
         // 请求成功，'response' 包含了请求的结果
         console.log(response.data); // 打印请求返回的数据
         this.historyData=response.data.data.records
@@ -164,43 +128,29 @@ export default{
         console.error('Error fetching data:', error);
       }
     },
+
+    toTime(array){
+      const date=`${array[0]}-${array[1].toString().padStart(2,'0')}-${array[2].toString().padStart(2,'0')}`
+      const time=`${array[3].toString().padStart(2,'0')}:${array[4].toString().padStart(2,'0')}`
+      return date+' '+time
+    },
+
+    // test(){
+    //   console.log(this.queryParams)
+    // },
   },
   computed:{
     displayData(){
       return this.historyData
-
-      // let data
-
-      // if(this.active>-1){
-      //   let subjectData=[];
-      //   for(let i=0;i<this.historyData.length;i++)
-      //     if(this.options[this.active] === this.historyData[i].subject)
-      //       subjectData.push(this.historyData[i])
-      //   data=subjectData
-      // }
-      // else
-      //   data=this.historyData
-
-      // if(this.search){
-      //   let searchData=[]
-      //   for(let i=0;i<data.length;i++)
-      //     for(let key in data[i]){
-      //       let it
-      //       if(typeof data[i][key] === "number")
-      //         it=String(data[i][key])
-      //       else
-      //         it=data[i][key]
-
-      //       if(it.includes(this.search)){
-      //         searchData.push(data[i])
-      //         break
-      //       }
-      //     }
-            
-      //   data=searchData
-      // }
-
-      // return data.slice((this.state.pageNum-1)*this.state.pageSize , this.state.pageNum*this.state.pageSize)
+    },
+    queryParams(){
+      return {
+        userId: this.userId,
+        keyword: this.state.searchValue,
+        subject: this.active===-1 ? '' : this.options[this.active],
+        page: this.state.pageNum,
+        pageSize: this.state.pageSize,
+      }
     }
   },
   mounted(){
