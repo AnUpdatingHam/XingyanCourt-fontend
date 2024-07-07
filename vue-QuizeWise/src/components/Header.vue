@@ -53,14 +53,6 @@ const goToPaper = ()=>{
 
 const login = ()=>{
     sendLoginRequest()
-    // test()
-    if(logined.value){
-        alert('登录成功')
-        loginAppear.value=false
-    }
-    else{
-        alert('用户名或密码错误')
-    }
 }
 
 const test = ()=>{
@@ -82,15 +74,19 @@ async function sendLoginRequest() {
                 'Content-Type': 'application/json'
             }
         });
-        // 请求成功，打印响应数据
-        console.log(response.data);
+      if(response.data.code===1){
+        console.log(response.data) //TODO: 打印日志，测试完毕可以删去
+        alert("登陆成功！")
+        logined.value=true
+        token.value = response.data.data.token
+        loginedUsername.value = response.data.data.username
+        imageUrl.value = response.data.data.imageUrl
 
-        if(response.data.code/100===2){
-            logined.value=true
-            token.value = response.data.data.token
-            loginedUsername.value = response.data.data.username
-            imageUrl.value = response.data.data.imageUrl
-        }
+        loginAppear.value=false
+      }
+      else{
+        alert(response.data.msg) // 打印错误信息
+      }
             
         
     } catch (error) {
