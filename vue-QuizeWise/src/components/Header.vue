@@ -11,7 +11,7 @@ import a11Img from '@/assets/a11.jpeg'
 const isCollapse = ref(true)
 // 获取父组件传递过来的数据 
 const showIcon = defineProps({
-    isCollapse: Boolean
+  isCollapse: Boolean
 })
 
 // 获取父组件自定义的事件
@@ -19,7 +19,7 @@ const emit = defineEmits(['changeAside'])
 
 // 自定义按钮点击事件，侧边栏的收缩按钮
 const collapseAside = () => {
-    emit('changeAside')
+  emit('changeAside')
 }
 
 // 登出按钮
@@ -40,114 +40,114 @@ const imageUrl=ref('')
 const loginedUsername=ref('')
 
 const bodyParams = ()=>{
-    return {
-        password: password.value,
-        username: username.value
-    }
+  return {
+    password: password.value,
+    username: username.value
+  }
 }
 
 const router = useRouter()
 const goToPaper = ()=>{
-    router.push({name: 'home'})
+  router.push({name: 'home'})
 }
 
 const login = ()=>{
-    sendLoginRequest()
+  sendLoginRequest()
 }
 
 const test = ()=>{
-    logined.value=true
-    token.value='ddd'
-    loginedUsername.value='管理员'
-    imageUrl.value='src/assets/a11.jpeg'
+  logined.value=true
+  token.value='ddd'
+  loginedUsername.value='管理员'
+  imageUrl.value='src/assets/a11.jpeg'
 }
 
 // // 定义一个异步函数来发送 POST 请求，更改对应id的用户信息
 async function sendLoginRequest() {
-    try {
-        // 使用 Axios 发送 POST 请求，并包含 JSON 数据
-        const response = await axios.post('http://localhost:8080/user/user/login', 
-        bodyParams(),
-        {
-            // 设置请求头，指明内容类型为 JSON
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-      if(response.data.code===1){
-        console.log(response.data) //TODO: 打印日志，测试完毕可以删去
-        alert("登陆成功！")
-        logined.value=true
-        token.value = response.data.data.token
-        loginedUsername.value = response.data.data.username
-        imageUrl.value = response.data.data.imageUrl
+  try {
+    // 使用 Axios 发送 POST 请求，并包含 JSON 数据
+    const response = await axios.post('http://localhost:8080/user/user/login', 
+    bodyParams(),
+    {
+      // 设置请求头，指明内容类型为 JSON
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    if(response.data.code===1){
+      console.log(response.data) //TODO: 打印日志，测试完毕可以删去
+      alert("登陆成功！")
+      logined.value=true
+      token.value = response.data.data.token
+      loginedUsername.value = response.data.data.username
+      imageUrl.value = response.data.data.imageUrl
 
-        loginAppear.value=false
-      }
-      else{
-        alert(response.data.msg) // 打印错误信息
-      }
-            
-        
-    } catch (error) {
-        // 请求失败，捕获并处理错误
-        console.error('Error update user:', error);
+      loginAppear.value=false
     }
+    else{
+      alert(response.data.msg) // 打印错误信息
+    }
+      
+    
+  } catch (error) {
+    // 请求失败，捕获并处理错误
+    console.error('Error update user:', error);
+  }
 }
 
 </script>
 
 
 <template>
-    <div>
-        <el-header style="display: flex;font-size: 16px;">
-            <div style="display: inline-flex;flex: 1; align-items: center;justify-content: left;">
-                <el-icon v-show="!showIcon.isCollapse" @click="collapseAside" style="color: #303133;">
-                    <Fold />
-                </el-icon>
-                <el-icon v-show="showIcon.isCollapse" @click="collapseAside" style="color: #303133;">
-                    <Expand />
-                </el-icon>
-            </div>
+  <div>
+    <el-header style="display: flex;font-size: 16px;">
+      <div style="display: inline-flex;flex: 1; align-items: center;justify-content: left;">
+        <el-icon v-show="!showIcon.isCollapse" @click="collapseAside" style="color: #303133;">
+          <Fold />
+        </el-icon>
+        <el-icon v-show="showIcon.isCollapse" @click="collapseAside" style="color: #303133;">
+          <Expand />
+        </el-icon>
+      </div>
 
-            <!-- 已登录状态 -->
-            <div class="toolbar" v-if="logined">
-                <div class="block" style="margin-right: 10px;">
-                    <el-avatar :size="40" :src="imageUrl" />
-                </div>
-                <span>{{ loginedUsername }}</span>
-                <el-dropdown trigger="click">
-                    <el-icon style="margin-left: 18px; margin-top: 1px;color: #303133;">
-                        <setting />
-                    </el-icon>
-                    <template #dropdown>
-                        <el-dropdown-menu>
-                            <el-dropdown-item>View</el-dropdown-item>
-                            <el-dropdown-item>Add</el-dropdown-item>
-                            <el-dropdown-item @click="LogOut">退出登录</el-dropdown-item>
-                        </el-dropdown-menu>
-                    </template>
-                </el-dropdown>
-            </div>
-            
-            <!-- 未登录状态 -->
-            <div class="header-login-button" v-if="!logined">
-                <button @click="loginAppear=true;goToPaper()">登录</button>
-            </div>
-            
-        </el-header>
-    </div>
-
-    <!-- 登录界面 -->
-    <div class="login-back" v-if="loginAppear">
-        <div class="login-content">
-            <h3>登录</h3>
-            <div class="close-button" @click="loginAppear=false">X</div>
-            <input v-model="username" class="username" type="text" placeholder="请输入账号" @keyup.enter="login">
-            <input v-model="password" class="password" type="password" placeholder="请输入密码" @keyup.enter="login">
-            <el-button @click="login" type="primary" round style="border-radius: 40px;width: 200px;height: 40px;background-color: #0608E3;font-size: 18px;font-weight: 400;margin-top:50px;">登录</el-button>
+      <!-- 已登录状态 -->
+      <div class="toolbar" v-if="logined">
+        <div class="block" style="margin-right: 10px;">
+          <el-avatar :size="40" :src="imageUrl" />
         </div>
+        <span>{{ loginedUsername }}</span>
+        <el-dropdown trigger="click">
+          <el-icon style="margin-left: 18px; margin-top: 1px;color: #303133;">
+            <setting />
+          </el-icon>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>View</el-dropdown-item>
+              <el-dropdown-item>Add</el-dropdown-item>
+              <el-dropdown-item @click="LogOut">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
+      
+      <!-- 未登录状态 -->
+      <div class="header-login-button" v-if="!logined">
+        <button @click="loginAppear=true;goToPaper()">登录</button>
+      </div>
+      
+    </el-header>
+  </div>
+
+  <!-- 登录界面 -->
+  <div class="login-back" v-if="loginAppear">
+    <div class="login-content">
+      <h3>登录</h3>
+      <div class="close-button" @click="loginAppear=false">X</div>
+      <input v-model="username" class="username" type="text" placeholder="请输入账号" @keyup.enter="login">
+      <input v-model="password" class="password" type="password" placeholder="请输入密码" @keyup.enter="login">
+      <el-button @click="login" type="primary" round style="border-radius: 40px;width: 200px;height: 40px;background-color: #0608E3;font-size: 18px;font-weight: 400;margin-top:50px;">登录</el-button>
     </div>
+  </div>
 
 
 </template>
@@ -156,49 +156,49 @@ async function sendLoginRequest() {
 
 <style>
 .el-header {
-    width: 100%;
-    background-color: #fff;
-    color: var(--el-text-color-primary);
-    box-shadow: var(--el-box-shadow);
+  width: 100%;
+  background-color: #fff;
+  color: var(--el-text-color-primary);
+  box-shadow: var(--el-box-shadow);
 }
 
 .toolbar {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    right: 20px;
-    text-align: right;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  right: 20px;
+  text-align: right;
 }
 
 .el-dropdown-menu__item {
-    width: 120px;
+  width: 120px;
 }
 
 .icon-color {
-    color: white;
+  color: white;
 }
 
 .header-login-button button{
-    background-color: #409EFF;
-    color: white;
-    font-size:16px;
-    padding: 10px;
-    padding-left: 30px;
-    padding-right: 30px;
-    margin:10px;
-    margin-right: 30px;
-    border:none;
-    border-radius: 30px;
+  background-color: #409EFF;
+  color: white;
+  font-size:16px;
+  padding: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin:10px;
+  margin-right: 30px;
+  border:none;
+  border-radius: 30px;
 }
 
 .header-login-button button:hover {
-    background-color: #1D91E8; 
-    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  background-color: #1D91E8; 
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
 }
 
 .header-login-button button:focus{
-    outline:none;
+  outline:none;
 }
 
 .login-back {
