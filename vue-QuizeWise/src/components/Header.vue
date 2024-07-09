@@ -5,6 +5,8 @@ import { ElMessage } from 'element-plus';
 
 import { useRouter } from 'vue-router';
 
+import { store } from '../store.js';
+
 import axios from 'axios';
 
 import a11Img from '@/assets/a11.jpeg'
@@ -99,6 +101,7 @@ async function sendLoginRequest() {
 
 
 <template>
+  count:{{ store.count }}
   <div>
     <el-header style="display: flex;font-size: 16px;">
       <div style="display: inline-flex;flex: 1; align-items: center;justify-content: left;">
