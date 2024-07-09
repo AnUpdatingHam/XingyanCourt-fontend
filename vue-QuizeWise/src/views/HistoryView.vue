@@ -87,7 +87,7 @@ export default{
       console.log("The current page changed")
     },
     goToPaper(){
-      this.$router.push({name: 'home'})
+      this.$router.push({name: 'paper'})
     },
     switchActive(idx){
       this.active=idx

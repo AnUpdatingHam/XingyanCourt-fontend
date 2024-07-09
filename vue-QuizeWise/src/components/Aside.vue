@@ -22,9 +22,17 @@ const iconColor = ref('color:#F8FAFB')
               <House />
             </el-icon><span>首页</span>
           </template>
-          <el-menu-item index="/paper">首页</el-menu-item>
+          <el-menu-item index="/">首页</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="2">
+          <template #title>
+            <el-icon>
+              <Edit />
+            </el-icon><span>创建试卷</span>
+          </template>
+          <el-menu-item index="/paper">创建试卷</el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="3">
           <template #title>
             <el-icon>
               <Menu />
@@ -32,15 +40,7 @@ const iconColor = ref('color:#F8FAFB')
           </template>
           <el-menu-item index="/history">历史生成记录</el-menu-item>
         </el-sub-menu>
-        <el-sub-menu index="3">
-          <template #title>
-            <el-icon>
-              <Message />
-            </el-icon><span>评论管理</span>
-          </template>
-          <el-menu-item index="/admin/comments">评论管理列表</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="4">
+        <!-- <el-sub-menu index="4">
           <template #title>
             <el-icon>
               <Files />
@@ -80,7 +80,7 @@ const iconColor = ref('color:#F8FAFB')
             </el-icon><span>系统设置</span>
           </template>
           <el-menu-item index="/admin/light">背景色</el-menu-item>
-        </el-sub-menu>
+        </el-sub-menu> -->
       </el-menu>
     </el-scrollbar>
   </el-aside>
