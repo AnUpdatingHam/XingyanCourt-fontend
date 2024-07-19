@@ -25,6 +25,7 @@
         <th>题数</th>
         <th>参考答案</th>
         <th>生成时间</th>
+        <th>操作</th>
       </tr>
     </thead>
     <tbody>
@@ -37,6 +38,15 @@
         <td>{{ item.questionCount }}</td>
         <td>{{ item.containAnswer ? '有': '无' }}</td>
         <td>{{ toTime(item.createTime) }}</td>
+        <td>
+          <a href="#" @click.prevent="handleEditing(index)" style="color: #87CEFA;">
+            <img src="../assets/edit.png" alt="Edit" width="16" height="16"> 改名
+          </a>
+          <span>&nbsp;    </span> <!-- 添加一个空格 -->
+          <a href="#" @click="deleteUser(item.id)" style="color: #87CEFA;">
+            <img src="../assets/delete.png" alt="Delete" width="16" height="16"> 删除
+          </a>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -58,6 +68,8 @@
 <script>
 // 引入 Axios 库
 import axios from 'axios';
+import {constant} from "@/stores/constant";
+import {store} from "@/stores/store";
 
 export default{
   data(){
@@ -65,6 +77,7 @@ export default{
       userId: 1,
       options: ["语文","数学","英语"],
       active: -1,
+      searchKeys: ["name", "subject", "grade", "type"],
       state:{
         pageNum: 1,
         pageSize: 10,
@@ -77,6 +90,7 @@ export default{
         // { id: 1, user_id: 0, name: "未命名22", subject: '语文',  grade: '高三', type: '高考', pageCount: 3, questionCount: 34, containAnswer: true, path: "rrr", createTime: [2024,5,6,10,0]},
         // { id: 2, user_id: 0, name: "未命名21", subject: '英语',  grade: '初二', type: '中考', pageCount: 5, questionCount: 44, containAnswer: false, path: "www", createTime: [2024,5,1,8,31]},
       ],
+      displayData:[],
     }
   },
   methods:{
@@ -117,7 +131,7 @@ export default{
       try {
         //get请求中特殊的query参数，拼接在路径里
         
-        const response = await axios.get('http://localhost:8080/user/user/page', {params: this.queryParams});
+        const response = await axios.get(`${constant.host}/user/testPaper/page`, {params: this.queryParams});
         // 请求成功，'response' 包含了请求的结果
         console.log(response.data); // 打印请求返回的数据
         this.historyData=response.data.data.records
@@ -140,16 +154,63 @@ export default{
     // },
   },
   computed:{
-    displayData(){
-      return this.historyData
-    },
     queryParams(){
       return {
-        userId: this.userId,
+        userId: store.user.id,
         keyword: this.state.searchValue,
         subject: this.active===-1 ? '' : this.options[this.active],
         page: this.state.pageNum,
         pageSize: this.state.pageSize,
+      }
+    },
+    pageOrHistoryDataChanged() {
+      const {historyData, state} = this
+      return {historyData, state}
+    }
+  },
+  watch: {
+    pageOrHistoryDataChanged: {
+      deep: true,
+      handler() {
+        if(this.state.searchValue === ''){
+          this.displayData = this.historyData
+          return
+        }
+        clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+          console.log("disp")
+          let data
+          if(this.active>-1){
+            let subjectData=[];
+            for(let i=0;i<this.historyData.length;i++)
+              if(this.options[this.active] === this.historyData[i].subject)
+                subjectData.push(this.historyData[i])
+            data=subjectData
+          }
+          else
+            data=this.historyData
+
+          if(this.state.searchValue){
+            let searchData=[]
+            for(let i=0;i<data.length;i++)
+              for(let key of this.searchKeys){
+                let it
+                if(typeof data[i][key] === "number")
+                  it=String(data[i][key])
+                else
+                  it=data[i][key]
+                if(it.includes(this.state.searchValue)){
+                  console.log("push + " + JSON.stringify(data[i]))
+                  searchData.push(data[i])
+                  break
+                }
+              }
+            data=searchData
+          }
+
+          this.displayData = data.slice((this.state.pageNum-1)*this.state.pageSize , this.state.pageNum*this.state.pageSize)
+          this.state.totalNumber = data.length
+        }, 300)
       }
     }
   },

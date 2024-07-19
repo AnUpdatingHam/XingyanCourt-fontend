@@ -6,6 +6,7 @@ import { ElMessage } from 'element-plus';
 import { store } from '@/stores/store'
 
 import axios from 'axios';
+import {constant} from "@/stores/constant";
 
 const isCollapse = ref(true)
 // 获取父组件传递过来的数据 
@@ -70,7 +71,7 @@ const login = ()=>{
 async function sendLoginRequest() {
   try {
     // 使用 Axios 发送 POST 请求，并包含 JSON 数据
-    const response = await axios.post('http://localhost:8080/user/user/login', 
+    const response = await axios.post(`${constant.host}/user/user/login`,
     bodyParams(),
     {
       // 设置请求头，指明内容类型为 JSON

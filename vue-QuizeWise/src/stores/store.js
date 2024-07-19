@@ -21,7 +21,7 @@ export const store = reactive({
     pageCount: 0,
     questionCount: 0,
     containAnswer: false,
-    path: '',
+    filepath: '',
     supplement: '',
     items: [
         1,1,1

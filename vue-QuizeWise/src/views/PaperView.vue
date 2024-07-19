@@ -54,7 +54,7 @@
 
     <div class="preview">
       <h3>在线预览</h3> 
-      <iframe src=""></iframe>
+      <iframe :src="`./src/rear-end/user_pdfs/${store.paper.filepath}`"></iframe>
 <!--      src/assets/preview2.pdf-->
       <!-- <img src="src/assets/a11.jpeg" > -->
     </div>
@@ -70,7 +70,10 @@
 // import pdf from "https://mozilla.github.io/pdf.js/build/pdf.js"
 
 import {store} from "@/stores/store";
-import {watch} from "vue";
+import {ref, watch} from "vue";
+import axios from "axios";
+import {ElMessage} from "element-plus";
+import {constant} from "@/stores/constant";
 
 //保存用户信息到cookie
 const setCookies = () => {
@@ -85,9 +88,9 @@ export default {
   data() {
     return {
       items:[
-        {name: '科目', opts:['语文','数学','英语']},
-        {name: '年级', opts:['初一','初二','初三','高一','高二','高三']},
-        {name: '考试类型', opts:['中考','高考','考研','CET4考试','CET6考试']}
+        {name: '科目', opts:['语文','数学','英语','物理','历史','化学','生物','地理','政治']},
+        {name: '年级', opts:['一','二','三','四','五','六']},
+        {name: '学习阶段', opts:['小学','初中','高中','大学','研究生','CET4考试','CET6考试']}
       ],
       actives: [-1,-1,-1],
       size: '',
@@ -106,8 +109,41 @@ export default {
       else 
         this.actives[idx]=-1
     },
-    generatePaper(){
-
+    async generatePaper(){
+      try {
+        const bodyParams = {
+          userId: store.user.id,
+          name: store.paper.name,
+          subject: this.items[0].opts[this.actives[0]],
+          grade: this.items[1].opts[this.actives[1]],
+          type: this.items[2].opts[this.actives[2]],
+          containAnswer: store.paper.containAnswer,
+          pageCount: store.paper.pageCount,
+          questionCount: store.paper.questionCount,
+          supplement: store.paper.supplement,
+          instruction: this.entryPreview,
+        }
+        // 使用 Axios 发送 POST 请求，并包含 JSON 数据
+        const response = await axios.post(`${constant.host}/user/AI/PDF/create`,
+            bodyParams,
+            {
+              // 设置请求头，指明内容类型为 JSON
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+        if(response.data.code===1){
+          ElMessage.success("生成成功")
+          console.log("ret = " + JSON.stringify(response))
+          store.paper.filepath = response.data.data.filepath
+        }
+        else{
+          ElMessage.error(response.data.msg)
+        }
+      } catch (error) {
+        // 请求失败，捕获并处理错误
+        console.error('Error update user:', error);
+      }
     }
   },
   computed:{
@@ -117,10 +153,10 @@ export default {
     entryPreview(){
       let subject=this.items[0].opts[this.actives[0]]
       let grade=this.items[1].opts[this.actives[1]]
-      let exam=this.items[2].opts[this.actives[2]]
+      let level=this.items[2].opts[this.actives[2]]
       let ret=''
-      if(exam && subject){
-        ret+='请你严格按照'+exam+'的格式，帮我生成一份名为' + store.paper.name + '的'+subject+'学科试卷'
+      if(level && subject){
+        ret+='请你严格按照'+level+'考试的格式，帮我生成一份名为' + store.paper.name + '的'+subject+'学科的'+level+grade+'年级试卷'
         if(store.paper.pageCount)
           ret+='，页数为：'+store.paper.pageCount
         if(store.paper.questionCount)
@@ -132,7 +168,6 @@ export default {
         if(store.paper.supplement)
           ret+='，另外，'+store.paper.supplement
       }
-      console.log("ret = " + ret)
       return ret
     }
   },
