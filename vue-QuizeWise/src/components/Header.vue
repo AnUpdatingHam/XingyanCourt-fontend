@@ -1,15 +1,12 @@
 <script setup>
-import { ref } from 'vue';
-
-import { ElMessage } from 'element-plus';
-
+import {ref, watch} from 'vue';
 import { useRouter } from 'vue-router';
 
-import { store } from '../store.js';
+import { ElMessage } from 'element-plus';
+import { store } from '@/stores/store'
 
 import axios from 'axios';
 
-import a11Img from '@/assets/a11.jpeg'
 const isCollapse = ref(true)
 // 获取父组件传递过来的数据 
 const showIcon = defineProps({
@@ -24,22 +21,34 @@ const collapseAside = () => {
   emit('changeAside')
 }
 
+//清除用户信息cookies
+const removeCookies = () => {
+  Object.keys(store.user).forEach((key) => $cookies.remove(key))
+  $cookies.remove("isAdmin")
+}
+
+//保存用户信息到cookie
+const setCookies = () => {
+  Object.keys(store.user).forEach((key) => $cookies.set(key, store.user[key]))
+  $cookies.set("isAdmin", store.isAdmin)
+  console.log($cookies.get('isAdmin'), store.isAdmin)
+}
+//监听登录信息，修改cookies
+watch(() => store.user, () => {
+  setCookies()
+}, {deep: true})
+
 // 登出按钮
 const LogOut = ()=>{
-  logined.value=false
-  token.value=''
+  store.login=false
+  removeCookies()
+  Object.keys(store.user).forEach((key) => delete(store.user[key]));
 }
 
 const loginAppear=ref(false)
 
 const username=ref('')
 const password=ref('')
-
-//用户参数
-const logined=ref(false)
-const token=ref('')
-const imageUrl=ref('')
-const loginedUsername=ref('')
 
 const bodyParams = ()=>{
   return {
@@ -57,13 +66,6 @@ const login = ()=>{
   sendLoginRequest()
 }
 
-const test = ()=>{
-  logined.value=true
-  token.value='ddd'
-  loginedUsername.value='管理员'
-  imageUrl.value='src/assets/a11.jpeg'
-}
-
 // // 定义一个异步函数来发送 POST 请求，更改对应id的用户信息
 async function sendLoginRequest() {
   try {
@@ -77,31 +79,26 @@ async function sendLoginRequest() {
       }
     });
     if(response.data.code===1){
-      console.log(response.data) //TODO: 打印日志，测试完毕可以删去
-      alert("登陆成功！")
-      logined.value=true
-      token.value = response.data.data.token
-      loginedUsername.value = response.data.data.username
-      imageUrl.value = response.data.data.imageUrl
+      ElMessage.success("登陆成功")
+
+      store.login=true
+      store.user = response.data.data
 
       loginAppear.value=false
+      console.log(store.user) //TODO: 打印日志，测试完毕可以删去
     }
     else{
-      alert(response.data.msg) // 打印错误信息
+      ElMessage.error(response.data.msg)
     }
-      
-    
   } catch (error) {
     // 请求失败，捕获并处理错误
     console.error('Error update user:', error);
   }
 }
-
 </script>
 
 
 <template>
-  count:{{ store.count }}
   <div>
     <el-header style="display: flex;font-size: 16px;">
       <div style="display: inline-flex;flex: 1; align-items: center;justify-content: left;">
@@ -114,11 +111,11 @@ async function sendLoginRequest() {
       </div>
 
       <!-- 已登录状态 -->
-      <div class="toolbar" v-if="logined">
+      <div class="toolbar" v-if="store.login">
         <div class="block" style="margin-right: 10px;">
-          <el-avatar :size="40" :src="imageUrl" />
+          <el-avatar :size="40" :src="store.user.imageUrl" />
         </div>
-        <span>{{ loginedUsername }}</span>
+        <span>{{ store.user.username }}</span>
         <el-dropdown trigger="click">
           <el-icon style="margin-left: 18px; margin-top: 1px;color: #303133;">
             <setting />
@@ -134,7 +131,7 @@ async function sendLoginRequest() {
       </div>
       
       <!-- 未登录状态 -->
-      <div class="header-login-button" v-if="!logined">
+      <div class="header-login-button" v-if="!store.login">
         <button @click="loginAppear=true;goToPaper()">登录</button>
       </div>
       
@@ -144,11 +141,12 @@ async function sendLoginRequest() {
   <!-- 登录界面 -->
   <div class="login-back" v-if="loginAppear">
     <div class="login-content">
-      <h3>登录</h3>
+      <h3>{{store.isAdmin ? "管理员" : "用户"}}登录</h3>
       <div class="close-button" @click="loginAppear=false">X</div>
       <input v-model="username" class="username" type="text" placeholder="请输入账号" @keyup.enter="login">
       <input v-model="password" class="password" type="password" placeholder="请输入密码" @keyup.enter="login">
       <el-button @click="login" type="primary" round style="border-radius: 40px;width: 200px;height: 40px;background-color: #0608E3;font-size: 18px;font-weight: 400;margin-top:50px;">登录</el-button>
+      <a href="#" class="admin-login-switcher" @click="store.isAdmin = !store.isAdmin">{{store.isAdmin ? "用户" : "管理员"}}登录</a>
     </div>
   </div>
 
@@ -214,6 +212,7 @@ async function sendLoginRequest() {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000; /* 一个较高的z-index值 */
 }
 
 .login-content {
@@ -278,6 +277,11 @@ async function sendLoginRequest() {
   margin-bottom: 20px;
 }
 
-
+.admin-login-switcher{
+  position: relative;
+  margin-left: 450px;
+  margin-top: 30px;
+  color: #1D91E8;
+}
 
 </style>

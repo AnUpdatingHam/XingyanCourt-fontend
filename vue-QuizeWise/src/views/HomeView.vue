@@ -6,6 +6,7 @@ import { RouterView } from "vue-router";
 import Header from '@/components/Header.vue'
 
 import Aside from '@/components/Aside.vue'
+import {store} from "@/stores/store";
 
 
 
@@ -24,7 +25,42 @@ const changeAside = ()=>{
    }
 }
 
+const readCookies = () => {
+  const userKeys = ["id", "stuId", "username", "phone", "email", "imageUrl", "createTime", "token"]
+  let userCk = {id : null, stuId : null, username : null, phone : null, email : null, imageUrl : null, createTime : null, token: null}
+  for(let key of userKeys) {
+    userCk[key] = $cookies.get(key)
+  }
+  if(userCk["id"]) {
+    store.user = userCk
+    store.login=true
+    store.isAdmin = ($cookies.get("isAdmin") === 'false')? false : true
+    console.log("读取cookie成功, store = ", store)
+  }
+  else console.log("读取cookie失败或没有cookie, idCk = ", userCk["id"])
 
+  const paperKeys = ["name", "subject", "grade", "type", "pageCount", "questionCount", "containAnswer", "filepath", "supplement", "items"];
+  let paperCk = {
+    name: '',
+    subject: '',
+    grade: '',
+    type: '',
+    pageCount: 0,
+    questionCount: 0,
+    containAnswer: false,
+    filepath: '',
+    supplement: '',
+    items: []
+  };
+// 读取 cookie 中的 paper 信息
+  for (let key of paperKeys) {
+    paperCk[key] = $cookies.get(key);
+  }
+  store.paper = paperCk;
+}
+
+//读取用户cookies
+readCookies()
 
 </script>
 <template>

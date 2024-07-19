@@ -9,7 +9,7 @@
           <div class="select-item" v-for="(item,index) in items" :key="index">
             <div class="select-row">
               <p>{{ item.name }}</p>
-              <div class="select-opt" v-for="(opt,index2) in item.opts" :key="index2" :class="{'active':actives[index]===index2}" @click="switchActive(index,index2)">
+              <div class="select-opt" v-for="(opt,optionIndex) in item.opts" :key="optionIndex" :class="{'active':actives[index]===optionIndex}" @click="switchActive(index,optionIndex)">
                 {{ opt }}
               </div>
             </div>
@@ -20,26 +20,26 @@
         <div class="defines">
           <div class="define">
             <label for="pageNumber">页数:</label>
-            <input type="text" id="pageNumber" v-model="pageNumber">
+            <input type="text" id="pageNumber" v-model="store.paper.pageCount">
           </div>
           <div class="define">
             <label for="problemNumber">题数:</label>
-            <input type="text" id="problemNumber" v-model="problemNumber">
+            <input type="text" id="problemNumber" v-model="store.paper.questionCount">
           </div>
         </div>
         <div class="answer-attach">
           <label for="answer">是否附带参考答案：</label>
-          <input type="checkbox" id="answer" v-model="answer">
+          <input type="checkbox" id="answer" v-model="store.paper.containAnswer">
         </div>
-        <div class="addtion">
-          <label for="addtion">自定义补充词条:</label>
-          <input type="text" id="addtion" v-model="addtion">
+        <div class="supplement">
+          <label for="supplement">自定义补充词条:</label>
+          <input type="text" id="supplement" v-model="store.paper.supplement">
         </div>
 
         <!-- 命名 -->
         <div class="name">
           <label for="name">给试卷命名</label>
-          <input type="text" id="name" v-model="name">
+          <input type="text" id="name" v-model="store.paper.name">
         </div>
 
         <!-- 词条预览 -->
@@ -48,13 +48,14 @@
           <textarea type="text" disabled v-model="entryPreview"></textarea>
         </div>
 
-        <button class="submit" type="submit">生成</button>
+        <button class="submit" type="submit" @click="generatePaper">生成</button>
       </form>
     </div>
 
     <div class="preview">
       <h3>在线预览</h3> 
-      <iframe src="src/assets/preview2.pdf"></iframe>
+      <iframe src=""></iframe>
+<!--      src/assets/preview2.pdf-->
       <!-- <img src="src/assets/a11.jpeg" > -->
     </div>
     
@@ -68,6 +69,18 @@
 
 // import pdf from "https://mozilla.github.io/pdf.js/build/pdf.js"
 
+import {store} from "@/stores/store";
+import {watch} from "vue";
+
+//保存用户信息到cookie
+const setCookies = () => {
+  Object.keys(store.paper).forEach((key) => $cookies.set(key, store.paper[key]))
+}
+//监听登录信息，修改cookies
+watch(() => store.paper, () => {
+  setCookies()
+}, {deep: true})
+
 export default {
   data() {
     return {
@@ -77,12 +90,7 @@ export default {
         {name: '考试类型', opts:['中考','高考','考研','CET4考试','CET6考试']}
       ],
       actives: [-1,-1,-1],
-      pageNumber: '',
-      problemNumber: '',
       size: '',
-      addtion: '',
-      answer:false,
-      name:'未命名',
       // 其他参数
     };
   },
@@ -97,30 +105,37 @@ export default {
         this.actives[idx]=idx2
       else 
         this.actives[idx]=-1
+    },
+    generatePaper(){
+
     }
   },
   computed:{
+    store() {
+      return store
+    },
     entryPreview(){
       let subject=this.items[0].opts[this.actives[0]]
       let grade=this.items[1].opts[this.actives[1]]
       let exam=this.items[2].opts[this.actives[2]]
       let ret=''
       if(exam && subject){
-        ret+='请你严格按照'+exam+'的格式，帮我生成一份'+subject+'试卷'
-        if(this.pageNumber)
-          ret+='，页数为：'+this.pageNumber
-        if(this.problemNumber)
-          ret+='，题数为：'+this.problemNumber
-        if(this.answer)
+        ret+='请你严格按照'+exam+'的格式，帮我生成一份名为' + store.paper.name + '的'+subject+'学科试卷'
+        if(store.paper.pageCount)
+          ret+='，页数为：'+store.paper.pageCount
+        if(store.paper.questionCount)
+          ret+='，题数为：'+store.paper.questionCount
+        if(store.paper.containAnswer)
           ret+='，生成一张试题卷后附带生成一张答案卷'
         else
           ret+='，不附带答案'
-        if(this.addtion)
-          ret+='，另外，'+this.addtion
+        if(store.paper.supplement)
+          ret+='，另外，'+store.paper.supplement
       }
+      console.log("ret = " + ret)
       return ret
     }
-  }
+  },
 };
 </script>
 
@@ -234,18 +249,25 @@ form {
   width: 25px;
 }
 
-.addtion{
-  margin-bottom: 20px;
-}
-
-.addtion input{
+.name input{
   margin-left:10px;
   height: 30px;
   font-size:18px;
   width: 500px;
 }
 
-.name input{
+.supplement{
+  margin-bottom: 20px;
+}
+
+.supplement input{
+  margin-left:10px;
+  height: 30px;
+  font-size:18px;
+  width: 500px;
+}
+
+.supplement input{
   margin-left:10px;
   height: 30px;
   font-size:18px;

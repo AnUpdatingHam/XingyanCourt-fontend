@@ -1,7 +1,4 @@
 <template>
-  <!-- 测试 -->
-  <div @click="test()">count:{{ count }}</div>
-
   <el-row style="width: 100%;height: 700px;background-image: url('src/assets/bg.svg');background-repeat: no-repeat;">
     <el-col :span="12"  style="width: 50%; display: flex;flex-direction: column;justify-content: center;align-items: center;">
       <h2 style="font-size:60px;font-weight:1000;margin-bottom: 20px;" >星焱文卷庭</h2>
@@ -21,22 +18,13 @@
 
 <script>
 
-import { store } from '../store.js';
-
 export default {
   methods:{
     goToPaper(){
       this.$router.push({name: 'paper'})
     },
-    test(){
-      console.log(store.count)
-      store.count++
-    }
   },
   computed:{
-    count(){
-      return store.count
-    }
   }
 
 };
