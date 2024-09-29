@@ -54,7 +54,7 @@
 
     <div class="preview">
       <h3>在线预览</h3> 
-      <iframe :src="`./src/rear-end/user_pdfs/${store.paper.filepath}`"></iframe>
+      <iframe :src="`./src/rear-end/${store.paper.filepath}`"></iframe>
 <!--      src/assets/preview2.pdf-->
       <!-- <img src="src/assets/a11.jpeg" > -->
     </div>
@@ -171,6 +171,9 @@ export default {
       return ret
     }
   },
+  mounted() {
+    console.log(`${store.paper.filepath}`)
+  }
 };
 </script>
 
